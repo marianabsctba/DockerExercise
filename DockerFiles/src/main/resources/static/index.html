@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Porta 8080 em Exposição</title>
+    <title>Mensagens na Porta 8080</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,22 +13,101 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            flex-direction: column;
         }
-        .message-box {
+        .message-box, .form-box {
             background-color: #fff;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 300px;
         }
         h1 {
             color: #333;
             font-size: 24px;
+            text-align: center;
+        }
+        .messages {
+            list-style-type: none;
+            padding: 0;
+        }
+        .messages li {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-<div class="message-box">
-    <h1>Aplicação Spring Boot em execução na porta 8080</h1>
+<div class="form-box">
+    <h1>Envie uma Mensagem</h1>
+    <input type="text" id="messageInput" placeholder="Digite sua mensagem">
+    <button onclick="sendMessage()">Enviar</button>
 </div>
+
+<div class="message-box">
+    <h1>Mensagens</h1>
+    <ul class="messages" id="messageList">
+        <!-- As mensagens serão listadas aqui -->
+    </ul>
+</div>
+
+<script>
+    // Função para buscar e mostrar mensagens
+    function fetchMessages() {
+        fetch('http://localhost:8080/messages')
+            .then(response => response.json())
+            .then(data => {
+                const messageList = document.getElementById('messageList');
+                messageList.innerHTML = ''; // Limpa a lista atual
+                data.forEach(message => {
+                    const li = document.createElement('li');
+                    li.textContent = message.content;
+                    messageList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Erro ao buscar mensagens:', error));
+    }
+
+    // Função para enviar uma nova mensagem
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const messageContent = messageInput.value;
+
+        fetch('http://localhost:8080/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: messageContent })
+        })
+            .then(response => response.json())
+            .then(data => {
+                messageInput.value = ''; // Limpa o campo de entrada
+                fetchMessages(); // Atualiza a lista de mensagens
+            })
+            .catch(error => console.error('Erro ao enviar mensagem:', error));
+    }
+
+    // Carregar as mensagens ao carregar a página
+    window.onload = fetchMessages;
+</script>
 </body>
 </html>

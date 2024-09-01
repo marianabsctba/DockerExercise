@@ -1,4 +1,5 @@
-package infnet.com.br.DockerFile.Model;
+package infnet.com.br.DockerFile.model;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
